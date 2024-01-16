@@ -1,0 +1,39 @@
+--- linux-3.10.14_orig/drivers/net/raeth/raether.c	2020-04-08 17:31:48.006729152 +0800
++++ linux-3.10.14/drivers/net/raeth/raether.c	2020-04-08 17:35:13.894724828 +0800
+@@ -2024,6 +2024,8 @@
+ 	u8 lan_gpio = 18;
+ #elif defined (CONFIG_GPIO_LTE3301P)
+  	int lan_gpio[4] = {15, 9, 11, 12};
++#elif defined (CONFIG_GPIO_LTE5389)
++	u8 lan_gpio = 25;
+ #endif
+ #if defined (CONFIG_GPIO_LTE_WITH_ETHWAN)
+      int reverse_port_no = 0;
+@@ -2049,7 +2051,8 @@
+     if(reg_val & 0x1) {
+ 	printk("ESW: Link Status Changed - Port%d Link UP\n", port_no);
+ 
+-#if defined (CONFIG_GPIO_LTE7240)
++#if defined (CONFIG_GPIO_LTE7240) || defined (CONFIG_GPIO_LTE5389)
++	*(unsigned long *)(RALINK_PIO_BASE + 0x00) |= 1<<(lan_gpio); //LAN LINK LED ON
+ 	*(unsigned long *)(RALINK_PIO_BASE + 0x00) |= 1<<(lan_gpio); //LAN LINK LED ON
+ 	*(unsigned long *)(RALINK_PIO_BASE + 0x20) |= 1<<(lan_gpio);
+ #endif	
+@@ -2109,7 +2112,7 @@
+     } else {	    
+ 	printk("ESW: Link Status Changed - Port%d Link Down\n", port_no);
+ 
+-#if defined (CONFIG_GPIO_LTE7240)
++#if defined (CONFIG_GPIO_LTE7240) || defined (CONFIG_GPIO_LTE5389)
+ 	*(unsigned long *)(RALINK_PIO_BASE + 0x00) |= 1<<(lan_gpio); //LAN LINK LED OFF	
+ 	*(unsigned long *)(RALINK_PIO_BASE + 0x20) &= ~(1<<lan_gpio);
+ #elif defined (CONFIG_GPIO_LTE3301P)
+@@ -5967,7 +5970,7 @@
+ 
+ #if defined (CONFIG_RAETH_GMAC2)
+ 
+-#ifdef CONFIG_GPIO_LTE7240
++#if defined (CONFIG_GPIO_LTE7240) || defined (CONFIG_GPIO_LTE5389)
+ 	printk("INFO: SKIP setting RMGII2 as Normal mode! \n"); //LTE7240 WIFI LED on GMII2 , so skip the RGMII2 Nomral Setting
+ #else
+ 	/*RGMII2=Normal mode*/

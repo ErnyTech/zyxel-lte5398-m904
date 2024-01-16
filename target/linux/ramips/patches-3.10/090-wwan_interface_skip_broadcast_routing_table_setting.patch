@@ -1,0 +1,35 @@
+--- linux-3.10.14.orig/net/ipv4/fib_frontend.c	2016-01-08 14:07:06.000000000 +0800
++++ linux-3.10.14/net/ipv4/fib_frontend.c	2022-03-02 15:14:16.393745676 +0800
+@@ -754,8 +754,13 @@ void fib_add_ifaddr(struct in_ifaddr *if
+ 		return;
+ 
+ 	/* Add broadcast address, if it is explicitly assigned. */
+-	if (ifa->ifa_broadcast && ifa->ifa_broadcast != htonl(0xFFFFFFFF))
+-		fib_magic(RTM_NEWROUTE, RTN_BROADCAST, ifa->ifa_broadcast, 32, prim);
++	if (ifa->ifa_broadcast && ifa->ifa_broadcast != htonl(0xFFFFFFFF)){
++		//for wwan skip broadcast routing table setting
++		if(strncmp(in_dev->dev->name, "wwan", 4)){
++			//printk("Device Name: %s\n", in_dev->dev->name);
++			fib_magic(RTM_NEWROUTE, RTN_BROADCAST, ifa->ifa_broadcast, 32, prim);
++		}
++	}
+ 
+ 	if (!ipv4_is_zeronet(prefix) && !(ifa->ifa_flags & IFA_F_SECONDARY) &&
+ 	    (prefix != addr || ifa->ifa_prefixlen < 32)) {
+@@ -765,9 +770,13 @@ void fib_add_ifaddr(struct in_ifaddr *if
+ 
+ 		/* Add network specific broadcasts, when it takes a sense */
+ 		if (ifa->ifa_prefixlen < 31) {
+-			fib_magic(RTM_NEWROUTE, RTN_BROADCAST, prefix, 32, prim);
+-			fib_magic(RTM_NEWROUTE, RTN_BROADCAST, prefix | ~mask,
+-				  32, prim);
++			//for wwan skip broadcast routing table setting
++			if(strncmp(in_dev->dev->name, "wwan", 4)){
++				//printk("Device Name: %s\n", in_dev->dev->name);
++				fib_magic(RTM_NEWROUTE, RTN_BROADCAST, prefix, 32, prim);
++				fib_magic(RTM_NEWROUTE, RTN_BROADCAST, prefix | ~mask,
++				 	 32, prim);
++			}
+ 		}
+ 	}
+ }

@@ -1,0 +1,19 @@
+--- linux-3.10.14/drivers.orig/net/raeth/raether.c	2021-01-15 11:20:26.734920799 +0800
++++ linux-3.10.14/drivers/net/raeth/raether.c	2021-01-15 11:32:13.894920799 +0800
+@@ -3726,6 +3726,16 @@
+ #endif  /* CONFIG_RAETH_HW_LRO */
+ 
+ 	forward_config(dev);
++
++#ifdef CONFIG_RAETH_JUMBOFRAME
++	mii_mgr_write(31,0x30e0,0x3f27);
++	sysRegWrite(0xbe110100, cpu_to_le32(0x2305e33b));
++	sysRegWrite(0xbe110200, cpu_to_le32(0x2305e33b));
++	sysRegWrite(0xbe100f0c, cpu_to_le32(0x08000800));
++	sysRegWrite(0xbe100f10, cpu_to_le32(0x08000800));
++	sysRegWrite(0xbe100f14, cpu_to_le32(0x08000800));
++#endif
++
+ 	return 0;
+ }
+ 

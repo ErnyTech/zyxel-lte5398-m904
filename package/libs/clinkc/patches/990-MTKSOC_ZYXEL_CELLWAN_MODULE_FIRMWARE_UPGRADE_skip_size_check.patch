@@ -1,0 +1,14 @@
+Index: src/cybergarage/http/chttp_packet.c
+===================================================================
+--- clinkc.orig/src/cybergarage/http/chttp_packet.c	2020-09-15 12:45:57.798471487 +0800
++++ clinkc/src/cybergarage/http/chttp_packet.c	2020-10-16 17:04:52.272564488 +0800
+@@ -960,6 +960,9 @@
+ 	int checkMemCnt=0;
+ 	if(isSizeExceedPatition(buflen)){
+ 		printf("\nexceed patition size\n");
++#ifdef ZYXEL_CELLWAN_MODULE_FIRMWARE_UPGRADE //Add skip default partiton size check mechanism for LTE module FW (~145MB) upgrade usage...
++		if (access("/tmp/skip_memcheck", F_OK) != 0)
++#endif 
+ 		return FALSE;
+ 	}
+ check_again:

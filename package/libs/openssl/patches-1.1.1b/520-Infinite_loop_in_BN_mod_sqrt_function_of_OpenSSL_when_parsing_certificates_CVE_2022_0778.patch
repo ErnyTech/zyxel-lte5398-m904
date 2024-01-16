@@ -1,0 +1,37 @@
+--- openssl-1.1.1b.orig/crypto/bn/bn_sqrt.c	2019-02-26 22:15:30.000000000 +0800
++++ openssl-1.1.1b/crypto/bn/bn_sqrt.c.new	2022-03-25 18:11:45.059962943 +0800
+@@ -300,18 +300,23 @@ BIGNUM *BN_mod_sqrt(BIGNUM *in, const BI
+             goto vrfy;
+         }
+ 
+-        /* find smallest  i  such that  b^(2^i) = 1 */
+-        i = 1;
+-        if (!BN_mod_sqr(t, b, p, ctx))
+-            goto end;
+-        while (!BN_is_one(t)) {
+-            i++;
+-            if (i == e) {
+-                BNerr(BN_F_BN_MOD_SQRT, BN_R_NOT_A_SQUARE);
+-                goto end;
++        /* Find the smallest i, 0 < i < e, such that b^(2^i) = 1. */
++        for (i = 1; i < e; i++) {
++            if (i == 1) {
++                if (!BN_mod_sqr(t, b, p, ctx))
++                    goto end;
++
++            } else {
++                if (!BN_mod_mul(t, t, t, p, ctx))
++                    goto end;
+             }
+-            if (!BN_mod_mul(t, t, t, p, ctx))
+-                goto end;
++            if (BN_is_one(t))
++                break;
++        }
++        /* If not found, a is not a square or p is not prime. */
++        if (i >= e) {
++            BNerr(BN_F_BN_MOD_SQRT, BN_R_NOT_A_SQUARE);
++            goto end;
+         }
+ 
+         /* t := y^2^(e - i - 1) */

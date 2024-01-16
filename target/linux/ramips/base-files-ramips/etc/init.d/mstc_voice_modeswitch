@@ -1,0 +1,29 @@
+#!/bin/sh
+
+export PATH=/home/bin:/home/scripts:/opt/bin:/bin:/sbin:/usr/bin:/usr/sbin
+export LD_LIBRARY_PATH=/lib/public:/lib/private:/usr/lib:/lib:/usr/lib/ebtables:/usr/lib/iptables
+
+case "$1" in
+	start)
+		echo "Mode Switch To Init Mode" >/dev/console
+		zyledctl VOLTE_MODE on
+		zyledctl VOIP_MODE on
+		;;
+
+	volte)
+		echo "Mode Switch To VOLTE Mode" >/dev/console
+		zyledctl VOIP_MODE on
+		zyledctl VOLTE_MODE off
+		;;
+
+	voip)
+		echo "Mode Switch To VOIP Mode" >/dev/console
+		zyledctl VOLTE_MODE on
+		zyledctl VOIP_MODE off
+		;;
+
+	*)
+		exit 1
+		;;
+esac
+

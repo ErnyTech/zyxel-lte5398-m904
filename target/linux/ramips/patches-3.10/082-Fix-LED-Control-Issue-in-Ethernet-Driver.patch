@@ -1,0 +1,46 @@
+--- linux-3.10.14.orig/drivers/net/raeth/raether.c	2019-10-15 16:54:43.111230024 +0800
++++ linux-3.10.14/drivers/net/raeth/raether.c	2019-12-30 14:15:56.837306892 +0800
+@@ -2021,9 +2021,11 @@ static void esw_link_status_changed(int
+ 	unsigned int tmp_speed;
+ #endif
+ #if defined (CONFIG_GPIO_LTE7240)
+-     u8 lan_gpio = 18;
+-#elif defined (CONFIG_GPIO_LTE_WITH_ETHWAN)
+-     int lan_gpio[4] = {15, 9, 11, 12};
++	u8 lan_gpio = 18;
++#elif defined (CONFIG_GPIO_LTE3301P)
++ 	int lan_gpio[4] = {15, 9, 11, 12};
++#endif
++#if defined (CONFIG_GPIO_LTE_WITH_ETHWAN)
+      int reverse_port_no = 0;
+ 		//Reverse the port_no report to ESMD to adapt ETHWAN change
+ 		if (port_no == 0)
+@@ -2056,7 +2058,7 @@ static void esw_link_status_changed(int
+ 	/*LAN port2 to eth2  */
+ 	if ( ((reg_val >>2) & 0x0003)==2)
+ 	{
+-#if defined (CONFIG_GPIO_LTE_WITH_ETHWAN)
++#if defined (CONFIG_GPIO_LTE3301P)
+ 		if ((port_no > 0) && (port_no < 3)) /* LAN1 & LAN2 LED is active high */
+ 		{
+ 			*(unsigned long *)(RALINK_PIO_BASE + 0x00) |= 1 << (lan_gpio[port_no]);
+@@ -2110,7 +2112,7 @@ static void esw_link_status_changed(int
+ #if defined (CONFIG_GPIO_LTE7240)
+ 	*(unsigned long *)(RALINK_PIO_BASE + 0x00) |= 1<<(lan_gpio); //LAN LINK LED OFF	
+ 	*(unsigned long *)(RALINK_PIO_BASE + 0x20) &= ~(1<<lan_gpio);
+-#elif defined (CONFIG_GPIO_LTE_WITH_ETHWAN)
++#elif defined (CONFIG_GPIO_LTE3301P)
+ 	if ((port_no > 0) && (port_no < 3))
+ 	{
+ 		*(unsigned long *)(RALINK_PIO_BASE + 0x00) |= 1 << (lan_gpio[port_no]);
+@@ -5768,7 +5770,9 @@ void IsSwitchVlanTableBusy(void)
+ 
+ void LANWANPartition(void)
+ {
+-#if defined (CONFIG_GPIO_LTE_WITH_ETHWAN) //Turn off the speed LED during Ethernet init 
++/*Turn off the speed LED during Ethernet init
++  This part of code create for LTE3301-PLUS */
++#if defined (CONFIG_GPIO_LTE3301P)
+ 	int i=0;
+ 	int lan_gpio[4] = {15, 9, 11, 12};
+ 	printk("Turn Off All related GPIO LED\n");

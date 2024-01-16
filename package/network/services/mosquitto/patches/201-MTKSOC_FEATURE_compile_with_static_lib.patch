@@ -1,0 +1,43 @@
+Index: mosquitto-1.6.7/config.mk
+===================================================================
+--- mosquitto-1.6.7.orig/config.mk	2019-09-25 19:18:26.000000000 +0800
++++ mosquitto-1.6.7/config.mk	2020-01-10 15:30:59.105387901 +0800
+@@ -130,7 +130,7 @@
+ 
+ STATIC_LIB_DEPS:=
+ 
+-LIB_CPPFLAGS=$(CPPFLAGS) -I. -I.. -I../lib -I../src/deps
++LIB_CPPFLAGS=$(CPPFLAGS) -I. -I.. -I../lib -I../src/deps -I../usr/include/openssl-1.1.1 -I../usr/include
+ LIB_CFLAGS:=$(CFLAGS)
+ LIB_CXXFLAGS:=$(CXXFLAGS)
+ LIB_LDFLAGS:=$(LDFLAGS)
+@@ -141,9 +141,9 @@
+ BROKER_LDFLAGS:=${LDFLAGS}
+ BROKER_LDADD:=
+ 
+-CLIENT_CPPFLAGS:=$(CPPFLAGS) -I.. -I../lib
++CLIENT_CPPFLAGS:=$(CPPFLAGS) -I.. -I../lib -I../usr/include/openssl-1.1.1 -I../usr/include
+ CLIENT_CFLAGS:=${CFLAGS} -DVERSION="\"${VERSION}\""
+-CLIENT_LDFLAGS:=$(LDFLAGS) -L../lib
++CLIENT_LDFLAGS:=$(LDFLAGS) -L../lib -L../usr/lib
+ CLIENT_LDADD:=
+ 
+ PASSWD_LDADD:=
+@@ -196,13 +196,13 @@
+ endif
+ 
+ ifeq ($(WITH_TLS),yes)
+-	BROKER_LDADD:=$(BROKER_LDADD) -lssl -lcrypto
+-	LIB_LIBADD:=$(LIB_LIBADD) -lssl -lcrypto
++	BROKER_LDADD:=$(BROKER_LDADD) -lpthread -lssl_1.1.1 -lcrypto_1.1.1 -ldl
++	LIB_LIBADD:=$(LIB_LIBADD) -lpthread -lssl_1.1.1 -lcrypto_1.1.1 -ldl
+ 	BROKER_CPPFLAGS:=$(BROKER_CPPFLAGS) -DWITH_TLS
+ 	LIB_CPPFLAGS:=$(LIB_CPPFLAGS) -DWITH_TLS
+-	PASSWD_LDADD:=$(PASSWD_LDADD) -lcrypto
++	PASSWD_LDADD:=$(PASSWD_LDADD) -lcrypto
+ 	CLIENT_CPPFLAGS:=$(CLIENT_CPPFLAGS) -DWITH_TLS
+-	STATIC_LIB_DEPS:=$(STATIC_LIB_DEPS) -lssl -lcrypto
++	STATIC_LIB_DEPS:=$(STATIC_LIB_DEPS) -lpthread -lssl_1.1.1 -lcrypto_1.1.1 -ldl
+ 
+ 	ifeq ($(WITH_TLS_PSK),yes)
+ 		BROKER_CPPFLAGS:=$(BROKER_CPPFLAGS) -DWITH_TLS_PSK

@@ -1,0 +1,14 @@
+--- linux-3.10.14_orig/drivers/net/raeth/raether.c	2020-04-28 16:33:08.280465191 +0800
++++ linux-3.10.14/drivers/net/raeth/raether.c	2020-04-28 16:34:51.100464174 +0800
+@@ -5968,9 +5968,9 @@
+ 	regValue |= (1<<6); //Disable Port 5
+ 	regValue |= (1<<13); //Port 5 as GMAC, no Internal PHY
+ 
+-#if defined (CONFIG_RAETH_GMAC2)
++#if defined (CONFIG_RAETH_GMAC2) && !defined (CONFIG_GPIO_LTE5389)
+ 
+-#if defined (CONFIG_GPIO_LTE7240) || defined (CONFIG_GPIO_LTE5389)
++#if defined (CONFIG_GPIO_LTE7240)
+ 	printk("INFO: SKIP setting RMGII2 as Normal mode! \n"); //LTE7240 WIFI LED on GMII2 , so skip the RGMII2 Nomral Setting
+ #else
+ 	/*RGMII2=Normal mode*/
